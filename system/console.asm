@@ -15,24 +15,12 @@
 		.const C_NLO = $43	// These one's are okay, though.
 		.const C_NHI = $44	// They are only used for non-interrupt subroutines.
 
-	// Refreshes console text.
-	C_RTXT:	{
-		// Initialize source pointer.
-		lda #<C_TBUF
-		sta C_SLO
-		lda #>C_TBUF
-		sta C_SHI
-
-		// Initialize destination pointer.
-		lda #<$047a
-		sta C_DLO
-		lda #>$047a
-		sta C_DHI
-
+	// Refreshes the console using pre-initialized zero-page pointers.
+	C_RCON: {
 		// Initialize registers.
 		ldx #0
 
-		// Update line in screen memory
+		// Update line in memory
 	loop1:	ldy #0
 	loop2:	lda (C_SLO),y
 		sta (C_DLO),y
@@ -69,6 +57,25 @@
 		rts
 	}
 
+	// Refreshes console text.
+	C_RTXT:	{
+		// Initialize source pointer.
+		lda #<C_TBUF
+		sta C_SLO
+		lda #>C_TBUF
+		sta C_SHI
+
+		// Initialize destination pointer.
+		lda #<$047a
+		sta C_DLO
+		lda #>$047a
+		sta C_DHI
+
+		// Perform update and leave.
+		jsr C_RCON
+		rts
+	}
+
 	// Refreshes console colors.
 	C_RCLR:	{
 		// Initialize source pointer.
@@ -83,43 +90,8 @@
 		lda #>$d87a
 		sta C_DHI
 
-		// Initialize registers.
-		ldx #0
-
-		// Update line in color memory
-	loop1:	ldy #0
-	loop2:	lda (C_SLO),y
-		sta (C_DLO),y
-		cpy #35
-		beq endl2
-		iny
-		jmp loop2
-
-	endl2:	// Finish if reached end.
-		cpx #19
-		beq endl1
-
-		// Advance source pointer.
-		clc
-		lda C_SLO
-		adc #36
-		sta C_SLO
-		bcc lordy
-		inc C_SHI
-
-		// Advance destination pointer.
-	lordy:	clc
-		lda C_DLO
-		adc #40
-		sta C_DLO
-		bcc hirdy
-		inc C_DHI
-
-		// Move down a line and go back.
-	hirdy:	inx
-		jmp loop1
-
-	endl1:	// Done, go back!
+		// Perform update and leave.
+		jsr C_RCON
 		rts
 	}
 
