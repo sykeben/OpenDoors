@@ -15,12 +15,12 @@
 		.const C_NLO = $43	// These one's are okay, though.
 		.const C_NHI = $44	// They are only used for non-interrupt subroutines.
 
-	// Refreshes the console using pre-initialized zero-page pointers.
+	// Refreshes the console using a bunch of pointers.
 	C_RCON: {
 		// Initialize registers.
 		ldx #0
 
-		// Update line in memory
+		// Update line in memory.
 	loop1:	ldy #0
 	loop2:	lda (C_SLO),y
 		sta (C_DLO),y
@@ -59,11 +59,19 @@
 
 	// Refreshes console text.
 	C_RTXT:	{
-		// Initialize source pointer.
+		// Initialize source start pointer.
 		lda #<C_TBUF
 		sta C_SLO
+		sta C_SSLO
 		lda #>C_TBUF
 		sta C_SHI
+		sta C_SSHI
+
+		// Initialize source end pointer.
+		lda #<C_TEND
+		sta C_SELO
+		lda #>C_TEND
+		sta C_SEHI
 
 		// Initialize destination pointer.
 		lda #<$047a
@@ -78,11 +86,19 @@
 
 	// Refreshes console colors.
 	C_RCLR:	{
-		// Initialize source pointer.
+		// Initialize source start pointer.
 		lda #<C_CBUF
 		sta C_SLO
+		sta C_SSLO
 		lda #>C_CBUF
 		sta C_SHI
+		sta C_SSHI
+
+		// Initialize source end pointer.
+		lda #<C_CEND
+		sta C_SELO
+		lda #>C_CEND
+		sta C_SEHI
 
 		// Initialize destination pointer.
 		lda #<$d87a
@@ -193,6 +209,16 @@
 	// but it won't be used that often so who cares.
 	C_FLAG: .byte $00
 
-	// Line offset.
-	// This is so we don't have to keep moving memory around.
-	C_LOFF: .byte $00
+	// Source offset values.
+	// This is used to implement a circular buffer.
+	// I don't want to have to shift memory around when I add a line.
+	C_SOLO: .byte $00
+	C_SOHI: .byte $00
+
+	// Source start/end values.
+	// These are used by the circular buffer to determine when to return to
+	// the start of the buffer and where that start is in memory.
+	C_SSLO: .byte $00
+	C_SSHI: .byte $00
+	C_SELO: .byte $00
+	C_SEHI: .byte $00
