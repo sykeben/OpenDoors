@@ -17,6 +17,15 @@
 
 	// Refreshes the console using a bunch of pointers.
 	C_RCON: {
+		// Offset source pointer.
+		clc
+		lda C_SSLO
+		adc C_SOLO
+		sta C_SLO
+		lda C_SSHI
+		adc C_SOHI
+		sta C_SHI
+
 		// Initialize registers.
 		ldx #0
 
@@ -38,19 +47,32 @@
 		lda C_SLO
 		adc #36
 		sta C_SLO
-		bcc lordy
+		bcc srdy
 		inc C_SHI
 
+		// Wrap source pointer around if hit end.
+	srdy:	lda C_SHI
+		cmp C_SEHI
+		bne snext
+		lda C_SLO
+		cmp C_SELO
+	snext:	beq swrap
+		jmp wrdy
+	swrap:	lda C_SSLO
+		sta C_SLO
+		lda C_SSHI
+		sta C_SHI
+
 		// Advance destination pointer.
-	lordy:	clc
+	wrdy:	clc
 		lda C_DLO
 		adc #40
 		sta C_DLO
-		bcc hirdy
+		bcc drdy
 		inc C_DHI
 
 		// Move down a line and go back.
-	hirdy:	inx
+	drdy:	inx
 		jmp loop1
 
 	endl1:	// Done, go back!
@@ -61,10 +83,8 @@
 	C_RTXT:	{
 		// Initialize source start pointer.
 		lda #<C_TBUF
-		sta C_SLO
 		sta C_SSLO
 		lda #>C_TBUF
-		sta C_SHI
 		sta C_SSHI
 
 		// Initialize source end pointer.
@@ -88,10 +108,8 @@
 	C_RCLR:	{
 		// Initialize source start pointer.
 		lda #<C_CBUF
-		sta C_SLO
 		sta C_SSLO
 		lda #>C_CBUF
-		sta C_SHI
 		sta C_SSHI
 
 		// Initialize source end pointer.

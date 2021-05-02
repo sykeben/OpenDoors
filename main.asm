@@ -62,6 +62,10 @@
 		jsr C_PREP
 		jsr C_ION
 
+		// Offset this bad boi.
+		lda #36
+		sta C_SOLO
+
 
 
 // "HALT" LOOP
