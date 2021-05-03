@@ -12,8 +12,10 @@
 		.const C_SHI = $FC
 		.const C_DLO = $FD
 		.const C_DHI = $FE
-		.const C_NLO = $43	// These one's are okay, though.
-		.const C_NHI = $44	// They are only used for non-interrupt subroutines.
+		.const C_MLO = $57	// These one's are okay, though.
+		.const C_MHI = $58	// They are only used for non-interrupt subroutines.
+		.const C_NLO = $59	// |
+		.const C_NHI = $60	// |
 
 	// Refreshes the console using a bunch of pointers.
 	C_RCON: {
@@ -197,6 +199,36 @@
 		stx C_FLAG
 	}
 
+	// Advances offset by one line.
+	C_ADV: {
+		// Advance offset.
+		clc
+		lda C_SOLO
+		adc #36
+		sta C_SOLO
+		bcc next
+		inc C_SOHI
+
+		// Check for wraparound.
+	next:	lda #<C_TEND-C_TBUF
+		cmp C_SOLO
+		bne ordy
+		lda #>C_TEND-C_TBUF
+		cmp C_SOHI
+		bne ordy
+
+		// Perform wraparound.
+		lda #$00
+		sta C_SOLO
+		sta C_SOHI
+
+		// Done.
+	ordy:	rts
+	}
+	.macro advanceOffset() {
+		jsr C_ADV
+	}
+
 
 
 // CONSOLE BUFFERS
@@ -207,13 +239,30 @@
 	// Note: The text buffer is encoded as raw characters.
 	// This is because the console update routines directly modify screen memory.
 	// An unintended side-effect of this is that you can use more cool characters.
-	C_TBUF: .fill 648,' '
-		.text "What is going on here?              "
-		.text "cool terminal stuff!                "
-	// C_TBUF:	.fill 720,$01
-	C_TEND: // Buffer end marker.
+	C_TBUF: .text "1                                   "
+		.text "2                                   "
+		.text "3                                   "
+		.text "4                                   "
+		.text "5                                   "
+		.text "6                                   "
+		.text "7                                   "
+		.text "8                                   "
+		.text "9                                   "
+		.text "10                                  "
+		.text "11                                  "
+		.text "12                                  "
+		.text "13                                  "
+		.text "14                                  "
+		.text "15                                  "
+		.text "16                                  "
+		.text "17                                  "
+		.text "18                                  "
+		.text "19                                  "
+		.text "20                                  "
+	// C_TBUF:	.fill 720,$20
+	C_TEND: .byte $ff // Buffer end marker.
 	C_CBUF: .fill 720,$01
-	C_CEND:	// Buffer end marker.
+	C_CEND: .byte $ff // Buffer end marker.
 
 	// Autorefresh enable flag.
 	// I would normally put this in the zero page,
@@ -223,12 +272,14 @@
 	// Source offset values.
 	// This is used to implement a circular buffer.
 	// I don't want to have to shift memory around when I add a line.
+	// Only to be used by interrupts.
 	C_SOLO: .byte $00
 	C_SOHI: .byte $00
 
 	// Source start/end values.
 	// These are used by the circular buffer to determine when to return to
 	// the start of the buffer and where that start is in memory.
+	// Only to be used by interrupts.
 	C_SSLO: .byte $00
 	C_SSHI: .byte $00
 	C_SELO: .byte $00

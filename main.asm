@@ -3,6 +3,7 @@
 		#import	"symbols/kernal.asm"
 		#import "system/coretext.asm"
 		#import "system/console.asm"
+		#import "system/delays.asm"
 
 
 
@@ -10,8 +11,7 @@
 
 		.pc=$0801 "Main: BASIC Loader"
 
-		// Basic line: 10 SYS 4096
-		.byte $0c,$08,$0a,$00,$9e,$20,$34,$30,$39,$36,$00,$00,$00
+		BasicUpstart2($1000)
 
 
 
@@ -65,9 +65,14 @@
 		prepAutorefresh()
 		autorefreshEnable(true)
 
-		// Offset this bad boi.
-		lda #36
-		sta C_SOLO
+		// Scroll around.
+	!loop:	advanceOffset()
+		delay(255)
+		delay(255)
+		delay(255)
+		delay(255)
+		delay(255)
+		jmp !loop-
 
 
 
@@ -83,3 +88,4 @@
 
 		// Title of the console window.
 	M_TITL:	.byte $6f,$50,$45,$4e,$64,$4f,$4f,$52,$53,$00 // "OpenDoors"
+	M_SRDY: .text @"System ready!\$00"
