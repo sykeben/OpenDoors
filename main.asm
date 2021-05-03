@@ -53,7 +53,7 @@
 		printLineVertical($dd,20)
 
 		// Revert to running colors.
-		setTheme(11,0,1)
+		setTheme(0,0,1)
 
 
 
