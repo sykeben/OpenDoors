@@ -29,28 +29,28 @@
 		setTheme(0,0,15)
 
 		// Draw title.
-		setCursor(1,1)
+		setCursor(2,1)
 		printString(M_TITL)
 
 		// Draw top of box.
 		setCursor(1,2)
-		printChar($6F)
-		printLineHorizontal($B7,36)
-		printChar($70)
+		printChar($b0)
+		printLineHorizontal($c0,36)
+		printChar($ae)
 
 		// Draw bottom of box.
 		setCursor(1,23)
-		printChar($6C)
-		printLineHorizontal($AF,36)
-		printChar($BA)
+		printChar($ad)
+		printLineHorizontal($c0,36)
+		printChar($bd)
 
 		// Draw left side of box.
 		setCursor(1,3)
-		printLineVertical($B4,20)
+		printLineVertical($dd,20)
 
 		// Draw right side of box.
 		setCursor(38,3)
-		printLineVertical($AA,20)
+		printLineVertical($dd,20)
 
 		// Revert to running colors.
 		setTheme(11,0,1)
