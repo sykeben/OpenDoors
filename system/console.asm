@@ -239,29 +239,18 @@
 	// Note: The text buffer is encoded as raw characters.
 	// This is because the console update routines directly modify screen memory.
 	// An unintended side-effect of this is that you can use more cool characters.
-	C_TBUF: .text "1                                   "
-		.text "2                                   "
-		.text "3                                   "
-		.text "4                                   "
-		.text "5                                   "
-		.text "6                                   "
-		.text "7                                   "
-		.text "8                                   "
-		.text "9                                   "
-		.text "10                                  "
-		.text "11                                  "
-		.text "12                                  "
-		.text "13                                  "
-		.text "14                                  "
-		.text "15                                  "
-		.text "16                                  "
-		.text "17                                  "
-		.text "18                                  "
-		.text "19                                  "
-		.text "20                                  "
+	C_TBUF: .fill 720,$a0
 	// C_TBUF:	.fill 720,$20
 	C_TEND: .byte $ff // Buffer end marker.
-	C_CBUF: .fill 720,$01
+	// C_CBUF:	.fill 720,$01
+	C_CBUF: .fill 36,02
+		.fill 36,08
+		.fill 36,07
+		.fill 36,05
+		.fill 36,06
+		.fill 36,03
+		.fill 36,04
+		.fill 36*13,$01
 	C_CEND: .byte $ff // Buffer end marker.
 
 	// Autorefresh enable flag.

@@ -71,7 +71,6 @@
 		delay(255)
 		delay(255)
 		delay(255)
-		delay(255)
 		jmp !loop-
 
 
