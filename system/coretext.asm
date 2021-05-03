@@ -12,6 +12,12 @@
 		.const T_SHI = $44
 		.const T_ACC = $02
 
+	// Changes text modes.
+	.macro setUppercaseMode(enabled) {
+		lda enabled ? $15:$17
+		sta $d018
+	}
+
 	// Prints a character.
 	.macro printChar(char) {
 		lda #char
@@ -123,16 +129,3 @@
 		setBackgroundColor(background)
 		setForegroundColor(foreground)
 	}
-
-
-
-// CORE TEXT DATA
-
-		.memblock "Core Text: Data"
-
-		// Title of the console window.
-	ctitle:	.text @"OPENDOORS V0.1\$00"
-
-		// Test lines.
-	ctln1:	.text @".........1.........2.........3......\$00"
-	ctln2:	.text @"123456789 123456789 123456789 123456\$00"

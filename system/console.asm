@@ -152,7 +152,7 @@
 	// Routine written from: https://www.c64-wiki.com/wiki/Raster_interrupt
 	C_PREP: {
 		// Set autorefresh enable flag to 0.
-		jsr C_IOFF
+		autorefreshEnable(false)
 
 		// Disable interrupts while we modify them.
 		sei
@@ -187,21 +187,14 @@
 		cli
 		rts
 	}
-
-	// Enables IRQ autorefresh.
-	C_ION: {
-		// Set active flag to 1.
-		ldx #$01
-		stx C_FLAG
-		rts
+	.macro prepAutorefresh() {
+		jsr C_PREP
 	}
 
-	// Disables IRQ autorefresh.
-	C_IOFF: {
-		// Set active flag to 0.
-		ldx #$00
+	// Enables/disables IRQ autorefresh.
+	.macro autorefreshEnable(enabled) {
+		ldx #enabled ? $01:$00
 		stx C_FLAG
-		rts
 	}
 
 
@@ -215,7 +208,7 @@
 	// This is because the console update routines directly modify screen memory.
 	// An unintended side-effect of this is that you can use more cool characters.
 	C_TBUF: .fill 648,' '
-		.text "what is going on here?              "
+		.text "What is going on here?              "
 		.text "cool terminal stuff!                "
 	// C_TBUF:	.fill 720,$01
 	C_TEND: // Buffer end marker.

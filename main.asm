@@ -22,12 +22,15 @@
 		// Initialize video chip.
 		jsr K_CINT
 
+		// Go into lowercase mode.
+		setUppercaseMode(false)
+
 		// Setup initialization colors.
 		setTheme(0,0,15)
 
 		// Draw title.
 		setCursor(1,1)
-		printString(ctitle)
+		printString(M_TITL)
 
 		// Draw top of box.
 		setCursor(1,2)
@@ -59,8 +62,8 @@
 		.memblock "Main: System Console"
 
 		// Prepare and enable autoupdate.
-		jsr C_PREP
-		jsr C_ION
+		prepAutorefresh()
+		autorefreshEnable(true)
 
 		// Offset this bad boi.
 		lda #36
@@ -71,3 +74,12 @@
 // "HALT" LOOP
 	
 	halt:	jmp halt
+
+
+
+// MAIN DATA
+
+	.memblock "Main: Data"
+
+		// Title of the console window.
+	M_TITL:	.byte $6f,$50,$45,$4e,$64,$4f,$4f,$52,$53,$00 // "OpenDoors"
