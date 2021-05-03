@@ -65,13 +65,9 @@
 		prepAutorefresh()
 		autorefreshEnable(true)
 
-		// Scroll around.
-	!loop:	advanceOffset()
-		delay(255)
-		delay(255)
-		delay(255)
-		delay(255)
-		jmp !loop-
+		// Notify user we're ready.
+		printConsole(M_SRDY)
+		printConsole(M_CTST)
 
 
 
@@ -85,6 +81,9 @@
 
 	.memblock "Main: Data"
 
+		.fill 1000,$00
+
 		// Title of the console window.
 	M_TITL:	.byte $6f,$50,$45,$4e,$64,$4f,$4f,$52,$53,$00 // "OpenDoors"
-	M_SRDY: .text @"System ready!\$00"
+	M_SRDY: .text @"System ready!                       foejafiejfiaoef oiaefioaeoifnoieaoie\$00"
+	M_CTST: .text @"0.........1.........2.........3.....0.........1.........2.........3.....\$00"

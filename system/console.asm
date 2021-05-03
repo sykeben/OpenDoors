@@ -12,10 +12,10 @@
 		.const C_SHI = $FC
 		.const C_DLO = $FD
 		.const C_DHI = $FE
-		.const C_MLO = $57	// These one's are okay, though.
-		.const C_MHI = $58	// They are only used for non-interrupt subroutines.
-		.const C_NLO = $59	// |
-		.const C_NHI = $60	// |
+		.const C_MLO = $43	// These one's are okay, though.
+		.const C_MHI = $44	// They are only used for non-interrupt subroutines.
+		.const C_NLO = $45	// |
+		.const C_NHI = $46	// |
 
 	// Refreshes the console using a bunch of pointers.
 	C_RCON: {
@@ -229,6 +229,78 @@
 		jsr C_ADV
 	}
 
+	// Prints a string to the console.
+	C_PRNT: {
+		// Load source pointers.
+		stx C_MLO
+		sty C_MHI
+
+		// Load destination pointer.
+		clc
+		lda #<C_TBUF
+		adc C_SOLO
+		sta C_NLO
+		lda #>C_TBUF
+		adc C_SOHI
+		sta C_NHI
+
+		// Write string into buffer.
+		ldx #36
+		ldy #$00
+	!loop:	lda (C_MLO),y
+		cmp #$00
+		beq !endl+
+		sta (C_NLO),y
+
+		// If at start of new line, go down one.
+		dex
+		cpx #$00
+		bne !again+
+		ldx #36
+		advanceOffset()
+
+		// Increment source pointer.
+	!again:	clc
+		inc C_MLO
+		bcc !next+
+		inc C_MHI
+
+		// Increment destination pointer.
+	!next:	clc
+		inc C_NLO
+		bcc !next+
+		inc C_NHI
+
+		// Do it again.
+	!next:	jmp !loop-
+
+		// Fill remaining line with spaces.
+	!endl:	ldy #$00
+	!loop:	lda #$20
+		sta (C_NLO),y
+		cpx #$00
+		beq !endl+
+
+		// Increment destination pointer.
+		clc
+		inc C_NLO
+		bcc !next+
+		inc C_NHI
+
+		// Do it again.
+	!next:	dex
+		jmp !loop-
+
+		// Advance & return.
+	!endl:	advanceOffset()
+		rts
+	}
+	.macro printConsole(location) {
+		ldx #<location
+		ldy #>location
+		jsr C_PRNT
+	}
+
 
 
 // CONSOLE BUFFERS
@@ -239,18 +311,9 @@
 	// Note: The text buffer is encoded as raw characters.
 	// This is because the console update routines directly modify screen memory.
 	// An unintended side-effect of this is that you can use more cool characters.
-	C_TBUF: .fill 720,$a0
-	// C_TBUF:	.fill 720,$20
+	C_TBUF:	.fill 720,$20
 	C_TEND: .byte $ff // Buffer end marker.
-	// C_CBUF:	.fill 720,$01
-	C_CBUF: .fill 36,02
-		.fill 36,08
-		.fill 36,07
-		.fill 36,05
-		.fill 36,06
-		.fill 36,03
-		.fill 36,04
-		.fill 36*13,$01
+	C_CBUF:	.fill 720,$01
 	C_CEND: .byte $ff // Buffer end marker.
 
 	// Autorefresh enable flag.
